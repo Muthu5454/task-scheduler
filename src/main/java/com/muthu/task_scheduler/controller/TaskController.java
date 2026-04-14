@@ -6,7 +6,6 @@ import com.muthu.task_scheduler.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -16,7 +15,6 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
-    // Create task
     @PostMapping
     public ResponseEntity<ApiResponse<Task>>
     createTask(@RequestBody Task task) {
@@ -28,7 +26,6 @@ public class TaskController {
                         "Task created successfully!"));
     }
 
-    // Get all tasks
     @GetMapping
     public ResponseEntity<ApiResponse
             <List<Task>>> getAllTasks() {
@@ -40,7 +37,6 @@ public class TaskController {
                         "Tasks retrieved successfully!"));
     }
 
-    // Get task by id
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Task>>
     getTaskById(@PathVariable Long id) {
@@ -57,7 +53,6 @@ public class TaskController {
                         "Task found successfully!"));
     }
 
-    // Delete task
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<String>>
     deleteTask(@PathVariable Long id) {
@@ -68,7 +63,6 @@ public class TaskController {
                         "Task deleted successfully!"));
     }
 
-    // Update task status
     @PutMapping("/{id}/status")
     public ResponseEntity<ApiResponse<Task>>
     updateStatus(
@@ -80,5 +74,38 @@ public class TaskController {
                 ApiResponse.success(
                         task,
                         "Status updated successfully!"));
+    }
+
+    @GetMapping("/priority/{priority}")
+    public ResponseEntity<ApiResponse<List<Task>>>
+    getTasksByPriority(
+            @PathVariable Task.Priority priority) {
+        List<Task> tasks = taskService
+                .getTasksByPriority(priority);
+        return ResponseEntity.ok(
+                ApiResponse.success(tasks,
+                        "Tasks fetched by priority!"));
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<ApiResponse<List<Task>>>
+    getTasksByStatus(
+            @PathVariable String status) {
+        List<Task> tasks = taskService
+                .getTasksByStatus(status);
+        return ResponseEntity.ok(
+                ApiResponse.success(tasks,
+                        "Tasks fetched by status!"));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<Task>>>
+    searchTasks(
+            @RequestParam String name) {
+        List<Task> tasks = taskService
+                .searchTasks(name);
+        return ResponseEntity.ok(
+                ApiResponse.success(tasks,
+                        "Search results!"));
     }
 }

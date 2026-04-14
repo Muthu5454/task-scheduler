@@ -20,21 +20,21 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
-    // Create new task
     public Task createTask(Task task) {
         log.info("Creating new task: {}",
                 task.getTaskName());
         task.setStatus("SCHEDULED");
-        task.setCreatedAt(
-                LocalDateTime.now());
-        Task saved =
-                taskRepository.save(task);
+        task.setCreatedAt(LocalDateTime.now());
+        if (task.getPriority() == null) {
+            task.setPriority(
+                    Task.Priority.MEDIUM);
+        }
+        Task saved = taskRepository.save(task);
         log.info("Task created with id: {}",
                 saved.getId());
         return saved;
     }
 
-    // Get all tasks
     public List<Task> getAllTasks() {
         log.info("Fetching all tasks");
         List<Task> tasks =
@@ -44,7 +44,6 @@ public class TaskService {
         return tasks;
     }
 
-    // Get task by id
     public Task getTaskById(Long id) {
         log.info(
                 "Fetching task with id: {}", id);
@@ -53,7 +52,6 @@ public class TaskService {
                 .orElse(null);
     }
 
-    // Delete task
     public void deleteTask(Long id) {
         log.info(
                 "Deleting task with id: {}", id);
@@ -63,7 +61,6 @@ public class TaskService {
                 id);
     }
 
-    // Update task status
     public Task updateTaskStatus(
             Long id, String status) {
         log.info(
@@ -75,15 +72,37 @@ public class TaskService {
             task.setStatus(status);
             task.setLastExecutedAt(
                     LocalDateTime.now());
-            Task updated =
-                    taskRepository.save(task);
-            log.info(
-                    "Task {} status updated to {}",
-                    id, status);
-            return updated;
+            return taskRepository.save(task);
         }
         log.warn(
                 "Task not found with id: {}", id);
         return null;
+    }
+
+    public List<Task> getTasksByPriority(
+            Task.Priority priority) {
+        log.info(
+                "Fetching tasks with priority: {}",
+                priority);
+        return taskRepository
+                .findByPriority(priority);
+    }
+
+    public List<Task> getTasksByStatus(
+            String status) {
+        log.info(
+                "Fetching tasks with status: {}",
+                status);
+        return taskRepository
+                .findByStatus(status);
+    }
+
+    public List<Task> searchTasks(
+            String name) {
+        log.info(
+                "Searching tasks with name: {}",
+                name);
+        return taskRepository
+                .findByTaskNameContaining(name);
     }
 }
